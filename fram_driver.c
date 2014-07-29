@@ -30,6 +30,74 @@ void Fram_Init()
 }
 
 /**
+ *	@brief	Тестирование ячеек энергонезависимой памяти
+ *			ВНИМАНИЕ. Выполнение функции занимает продолжительное время
+ *	@param	void
+ *	@return	int 0 - успешное тестирование
+ *			int (-1) - ошибка тестирования
+ */
+int Fram_Test()
+{
+	uint16_t i;
+	uint8_t data, readData;
+
+	for (i = 0; i < FRAM_SIZE; ++i) {
+		prv_ReadBlock(&data, sizeof(uint8_t), i);
+		data = ~data;
+		prv_WriteBlock(&data, sizeof(uint8_t), i);
+		prv_ReadBlock(&readData, sizeof(uint8_t), i);
+		if (data != readData)	{
+			return -1;
+		}
+	}
+	return 0;
+}
+
+/**
+ *	@brief	Определение размера энергонезависимой памяти. Во все возможные ячейки
+ *			записывается нуль. В нулевую ячейку записывается маркер mark.
+ *			Начиная с первой ячейки последовательным чтением ищется маркер
+ *			ВНИМАНИЕ. Выполнение функции занимает продолжительное время
+ *	@param	void
+ *	@return	int количество ячеек памяти
+ *			int (-1) - ошибка, маркер не найден.
+ */
+int Fram_CalculateSize()
+{
+	uint8_t mark = 0xB0;
+	uint8_t data = 0xA0;
+	uint16_t i = 0;
+
+	for (i = 0; i < 0xFFFF; ++i) {
+		prv_WriteBlock(&data, sizeof(uint8_t), i);
+	}
+
+	prv_WriteBlock(&mark, sizeof(uint8_t), 0);
+
+	for (i = 1; i < 0xFFFF; ++i) {
+		prv_ReadBlock(&data, sizeof(uint8_t), i);
+		if (data == mark)	{
+			return i;
+		}
+	}
+	return -1;
+}
+
+/**
+ *	@brief	Заполнение ячеек памяти данными data
+ *			ВНИМАНИЕ. Выполнение функции занимает продолжительное время
+ *	@param	uint8_t data - заполняющие данные
+ *	@return	void
+ */
+void Fram_Memset(uint8_t data)
+{
+	uint16_t i = 0;
+	for (i = 0; i < FRAM_SIZE; ++i) {
+		prv_WriteBlock(&data, sizeof(uint8_t), i);
+	}
+}
+
+/**
  *	@brief	Запись в энергонезависимую память по указанному адресу одного байта.
  *	@param	uint8_t data - записываемый байт
  *			uint16_t adr - адрес в энергонезависимой памяти

@@ -3,7 +3,12 @@
 
 int main ()
 {
-	Fram_Init();				// инициализаци¤ модул¤
+	Fram_Init();				// инициализаци¤ модуля
+	volatile int result = 0;
+	result = Fram_CalculateSize();
+	result = Fram_Test();
+	Fram_Memset(0xFF);
+
 	float data = 0;				// объ¤вл¤ем переменную и присваиваем ее нулю
 	Fram_ReadFloat(&data, 32);	// читаем в эту переменную данные из ¤чейки 32
 	data = 56.4343f;
