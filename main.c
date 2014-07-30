@@ -1,6 +1,9 @@
 ﻿#include "stm32f10x.h"
 #include "fram_driver.h"
 #include  "data_manager.h"
+
+void DataManager_ErrorHandler(int error);
+
 int main ()
 {
 	Fram_Init();				// инициализаци¤ модуля
@@ -9,32 +12,32 @@ int main ()
 	float qfloatData = 6.434f;
 	uint8_t qdata8 = 150;
 
-	DataManaget_Write(&qdata32, data32);
-	DataManaget_Write(&qfloatData, floatData);
-	DataManaget_Write(&qdata8, data1);
+	DataManager_Write(&qdata32, data32);
+	DataManager_Write(&qfloatData, floatData);
+	DataManager_Write(&qdata8, data1);
 
 	qdata32 = 0;
 	qfloatData = 0;
 	qdata8 = 0;
 
-	DataManaget_Read(&qdata32, data32);
-	DataManaget_Read(&qfloatData, floatData);
-	DataManaget_Read(&qdata8, data1);
+	DataManager_Read(&qdata32, data32);
+	DataManager_Read(&qfloatData, floatData);
+	DataManager_Read(&qdata8, data1);
 
-	DefaultData.data1 = 45;
-	DefaultData.data2 = 34;
-	DefaultData.floatData = 6.43f;
-	DefaultData.data32 = 45000;
+	DataManager_Data.data1 = 45;
+	DataManager_Data.data2 = 34;
+	DataManager_Data.floatData = 6.43f;
+	DataManager_Data.data32 = 45000;
 
 	DataManager_Store(data1);
 	DataManager_Store(data2);
 	DataManager_Store(floatData);
 	DataManager_Store(data32);
 
-	DefaultData.data1 = 0;
-	DefaultData.data2 = 0;
-	DefaultData.floatData = 0;
-	DefaultData.data32 = 0;
+	DataManager_Data.data1 = 0;
+	DataManager_Data.data2 = 0;
+	DataManager_Data.floatData = 0;
+	DataManager_Data.data32 = 0;
 
 	DataManager_Load(data1);
 	DataManager_Load(data2);
@@ -59,6 +62,26 @@ int main ()
 	while ( 1 ) {
 
 	}
+}
+
+void DataManager_ErrorHandler(int error)
+{
+	switch (error)
+	{
+	case DATA_MANAGER_ERR_WR:
+
+		break;
+	case DATA_MANAGER_ERR_RD:
+
+		break;
+	case DATA_MANAGER_ERR_CHK:
+
+		break;
+	default:
+
+		break;
+	}
+	while(1);
 }
 
 void assert_failed(uint8_t* file, uint32_t line)

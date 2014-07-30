@@ -2,3 +2,6 @@
 Подробности:
 http://elisbred.blogspot.ru/2014/04/i2c-stm32.html
 http://elisbred.blogspot.ru/2014/04/stm32.html
+
+TODO:
+ - Функция загрузки параметров по-умолчанию в случае ошибки чтения данных
