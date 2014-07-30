@@ -40,3 +40,7 @@ DataManager_Data_t DataManager_DefaultData;
 void DataManager_Init();
 void DataManager_WriteBlock(void *buf, size_t blockSize, uint16_t blockAdr);
 void DataManager_ReadBlock(void *buf, size_t blockSize, uint16_t blockAdr);
+
+uint32_t DataManager_GetReadErrors();
+uint32_t DataManager_GetWriteErrors();
+void DataManager_ReserErrors();

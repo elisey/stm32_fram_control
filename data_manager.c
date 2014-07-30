@@ -3,6 +3,9 @@
 #include "i2cSoft.h"
 #include <string.h>
 
+uint32_t readErrorsCounter = 0;
+uint32_t writeErrorsCounter = 0;
+
 static bool prv_TryWriteBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr);
 static bool prv_TryReadBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr);
 #ifdef LOAD_DEFAULT_DATA
@@ -71,6 +74,22 @@ void DataManager_ReadBlock(void *buf, size_t blockSize, uint16_t blockAdr)
 
 }
 
+uint32_t DataManager_GetReadErrors()
+{
+	return readErrorsCounter;
+}
+
+uint32_t DataManager_GetWriteErrors()
+{
+	return writeErrorsCounter;
+}
+
+void DataManager_ReserErrors()
+{
+	readErrorsCounter = 0;
+	writeErrorsCounter = 0;
+}
+
 static bool prv_TryWriteBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr)
 {
     uint8_t i;
@@ -80,6 +99,7 @@ static bool prv_TryWriteBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr)
         result = Memory_WriteBlock(buf,blockSize, blockAdr);
         if (result)
             return true;
+        writeErrorsCounter++;
     }
     return false;
 }
@@ -93,6 +113,7 @@ static bool prv_TryReadBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr)
         result = Memory_ReadBlock(buf, blockSize, blockAdr);
         if (result)
             return true;
+        readErrorsCounter++;
     }
     return false;
 }
