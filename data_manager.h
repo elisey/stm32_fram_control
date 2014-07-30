@@ -4,9 +4,14 @@
 #include "stdint.h"
 #include "data_manager_config.h"
 
+#define LOAD_DEFAULT_DATA		1
+
 #define NUM_OF_TRYS_TO_LOAD     3
 
 DataManager_Data_t DataManager_Data;
+#ifdef LOAD_DEFAULT_DATA
+DataManager_Data_t DataManager_DefaultData;
+#endif
 
 //	Распределение адресов таблиц в энергонезависимой памяти
 #define DataManager_MainTable     	0
@@ -23,24 +28,6 @@ DataManager_Data_t DataManager_Data;
 #define DATA_MANAGER_ERR_WR			(-1)
 #define DATA_MANAGER_ERR_RD			(-2)
 #define DATA_MANAGER_ERR_CHK		(-3)
-
-/* You need to implement this function. Example:
- * void DataManager_ErrorHandler(int error)
-{
-	switch (error)
-	{
-	case DATA_MANAGER_ERR_WR:
-		break;
-	case DATA_MANAGER_ERR_RD:
-		break;
-	case DATA_MANAGER_ERR_CHK:
-		break;
-	default:
-	break;
-	}
-}
- */
-extern void DataManager_ErrorHandler(int error);
 
 #define SIZE_OF_MEMBER(s,m) 		((size_t)sizeof(s.m))
 

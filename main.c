@@ -1,88 +1,63 @@
 ﻿#include "stm32f10x.h"
 #include "fram_driver.h"
-#include  "data_manager.h"
+#include "data_manager.h"
 
 void DataManager_ErrorHandler(int error);
 
 int main ()
 {
-	Fram_Init();				// инициализаци¤ модуля
+	DataManager_Init();
+	Fram_Memset(0xff);
 
-	uint32_t qdata32 = 54;
-	float qfloatData = 6.434f;
-	uint8_t qdata8 = 150;
-
-	DataManager_Write(&qdata32, data32);
-	DataManager_Write(&qfloatData, floatData);
-	DataManager_Write(&qdata8, data1);
-
-	qdata32 = 0;
-	qfloatData = 0;
-	qdata8 = 0;
-
-	DataManager_Read(&qdata32, data32);
-	DataManager_Read(&qfloatData, floatData);
-	DataManager_Read(&qdata8, data1);
-
-	DataManager_Data.data1 = 45;
-	DataManager_Data.data2 = 34;
-	DataManager_Data.floatData = 6.43f;
-	DataManager_Data.data32 = 45000;
-
-	DataManager_Store(data1);
-	DataManager_Store(data2);
-	DataManager_Store(floatData);
-	DataManager_Store(data32);
-
-	DataManager_Data.data1 = 0;
-	DataManager_Data.data2 = 0;
-	DataManager_Data.floatData = 0;
-	DataManager_Data.data32 = 0;
-
-	DataManager_Load(data1);
-	DataManager_Load(data2);
-	DataManager_Load(floatData);
+	// Попытка загрузить данные из очищенной памяти.
+	DataManager_Load(data8);
+	DataManager_Load(dataFloat);
 	DataManager_Load(data32);
 
-	volatile int result = 0;
-	result = Fram_CalculateSize();
-	result = Fram_Test();
-	Fram_Memset(0xFF);
+	// Запись данных из локальных переменных
+    uint8_t _data8 = 2;
+    float _dataFloat = 4;
+    uint32_t _data32 = 5;
 
-	float data = 0;				// объ¤вл¤ем переменную и присваиваем ее нулю
-	Fram_ReadFloat(&data, 32);	// читаем в эту переменную данные из ¤чейки 32
-	data = 56.4343f;
-	Fram_WriteFloat(data, 32);	// записываем число 56.4343f в ¤чейку
-	data = 0;
-	Fram_ReadFloat(&data, 32);	// читаем число и убеждаемс¤ что оно совпадает
-	data = 66.4343f;
-	Fram_WriteFloat(data, 32);	// пишем другое число, чтоб при следующем запуске
-								// программы прочитать его и убедитс¤ что оно
-								// сохранилось во врем¤ отключенного питани¤.
+	DataManager_Write(&_data8, data8);
+	DataManager_Write(&_dataFloat, dataFloat);
+	DataManager_Write(&_data32, data32);
+
+	_data8 = 0;
+	_dataFloat = 0;
+	_data32 = 0;
+
+	// Чтение данных в локальные переменные
+	DataManager_Read(&_data8, data8);
+	DataManager_Read(&_dataFloat, dataFloat);
+	DataManager_Read(&_data32, data32);
+
+	// копирование данных в структуру данных
+	DataManager_Data.data8 = _data8 + 8;
+	DataManager_Data.data32 = _data32 + 32;
+	DataManager_Data.dataFloat = _dataFloat + 0.56f;
+
+	// запись данных из структуры данных
+	DataManager_Store(data8);
+	DataManager_Store(dataFloat);
+	DataManager_Store(data32);
+
+	// обнуление структуры данных
+	DataManager_Data.data8 = 0;
+	DataManager_Data.data32 = 0;
+	DataManager_Data.dataFloat = 0;
+
+	// загрузка данных в структуру данных
+	DataManager_Load(data8);
+	DataManager_Load(dataFloat);
+	DataManager_Load(data32);
+
 	while ( 1 ) {
 
 	}
 }
 
-void DataManager_ErrorHandler(int error)
-{
-	switch (error)
-	{
-	case DATA_MANAGER_ERR_WR:
 
-		break;
-	case DATA_MANAGER_ERR_RD:
-
-		break;
-	case DATA_MANAGER_ERR_CHK:
-
-		break;
-	default:
-
-		break;
-	}
-	while(1);
-}
 
 void assert_failed(uint8_t* file, uint32_t line)
 {

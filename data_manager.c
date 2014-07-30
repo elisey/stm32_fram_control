@@ -5,6 +5,9 @@
 
 static bool prv_TryWriteBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr);
 static bool prv_TryReadBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr);
+#ifdef LOAD_DEFAULT_DATA
+static void prv_LoadDefaultData(void *buf, size_t blockSize, uint16_t blockAdr);
+#endif
 
 /*----------------------------------------------------------------------------
  * arg:     void
@@ -13,6 +16,9 @@ static bool prv_TryReadBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr);
  ----------------------------------------------------------------------------*/
 void DataManager_Init()
 {
+#ifdef LOAD_DEFAULT_DATA
+	DataManager_InitDefaultData();
+#endif
     i2cSoft_Init();
 }
 
@@ -53,6 +59,9 @@ void DataManager_ReadBlock(void *buf, size_t blockSize, uint16_t blockAdr)
 		invertBuf[i] = ~invertBuf[i];
 
 		if (straightBuf[i] != invertBuf[i])	{
+#ifdef LOAD_DEFAULT_DATA
+			prv_LoadDefaultData(buf, blockSize, blockAdr);
+#endif
 			DataManager_ErrorHandler(DATA_MANAGER_ERR_CHK);
 			return;
 		}
@@ -87,3 +96,13 @@ static bool prv_TryReadBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr)
     }
     return false;
 }
+
+#ifdef LOAD_DEFAULT_DATA
+static void prv_LoadDefaultData(void *buf, size_t blockSize, uint16_t blockAdr)
+{
+	uint8_t *ptrDefaultData;
+	ptrDefaultData = ((uint8_t*)&DataManager_DefaultData) + blockAdr;
+
+	memcpy( (void*)buf, (const void*)ptrDefaultData, blockSize );
+}
+#endif
