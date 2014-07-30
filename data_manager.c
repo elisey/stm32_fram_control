@@ -68,7 +68,7 @@ static bool prv_TryWriteBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr)
     bool result;
 
     for (i = 0; i < NUM_OF_TRYS_TO_LOAD; ++i) {
-        result = Fram_WriteBlock(buf,blockSize, blockAdr);
+        result = Memory_WriteBlock(buf,blockSize, blockAdr);
         if (result)
             return true;
     }
@@ -81,7 +81,7 @@ static bool prv_TryReadBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr)
     bool result;
 
     for (i = 0; i < NUM_OF_TRYS_TO_LOAD; ++i) {
-        result = Fram_ReadBlock(buf, blockSize, blockAdr);
+        result = Memory_ReadBlock(buf, blockSize, blockAdr);
         if (result)
             return true;
     }
