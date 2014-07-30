@@ -46,7 +46,7 @@ void i2cSoft_Init ()
  *			true в случае успеха
  *			false в случае ошибки
  */
-int i2cSoft_ReadBuffer ( uint8_t chipAddress, uint8_t *buffer, uint32_t sizeOfBuffer )
+int i2cSoft_ReadBuffer ( uint8_t chipAddress, void *buffer, uint32_t sizeOfBuffer )
 {
 	if ( !i2cSoft_Start() )
 		return false;
@@ -58,7 +58,7 @@ int i2cSoft_ReadBuffer ( uint8_t chipAddress, uint8_t *buffer, uint32_t sizeOfBu
 	}
 
 	while ( sizeOfBuffer != 0 ) {
-		*buffer = i2cSoft_GetByte();
+		*(uint8_t*)buffer = i2cSoft_GetByte();
 
 		buffer++;
 		sizeOfBuffer--;
@@ -84,7 +84,7 @@ int i2cSoft_ReadBuffer ( uint8_t chipAddress, uint8_t *buffer, uint32_t sizeOfBu
  *			true в случае успеха
  *			false в случае ошибки
  */
-int i2cSoft_WriteBuffer ( uint8_t chipAddress, uint8_t *buffer, uint32_t sizeOfBuffer )
+int i2cSoft_WriteBuffer ( uint8_t chipAddress, void *buffer, uint32_t sizeOfBuffer )
 {
 	if ( !i2cSoft_Start() )
 		return false;
@@ -96,7 +96,7 @@ int i2cSoft_WriteBuffer ( uint8_t chipAddress, uint8_t *buffer, uint32_t sizeOfB
 	}
 
 	while ( sizeOfBuffer != 0 ) {
-		i2cSoft_PutByte( *buffer );
+		i2cSoft_PutByte( *(uint8_t *)buffer );
 		if ( !i2cSoft_WaitAck() ) {
 			i2cSoft_Stop();
 			return false;
