@@ -24,10 +24,10 @@
 #define SCLread						I2C_GPIO->IDR & GPIO_Pin_SCL
 #define SDAread						I2C_GPIO->IDR & GPIO_Pin_SDA
 
-#define I2C_DELAY_VALUE				2
+#define I2C_DELAY_VALUE				10
 
 void i2cSoft_Init ();
-int i2cSoft_ReadBuffer (uint8_t chipAddress, uint8_t *buffer, uint32_t sizeOfBuffer);
-int i2cSoft_WriteBuffer (uint8_t chipAddress, uint8_t *buffer, uint32_t sizeOfBuffer);
+int i2cSoft_ReadBuffer (uint8_t chipAddress, void *buffer, uint32_t sizeOfBuffer);
+int i2cSoft_WriteBuffer (uint8_t chipAddress, void *buffer, uint32_t sizeOfBuffer);
 
 #endif

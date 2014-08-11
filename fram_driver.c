@@ -12,8 +12,6 @@
 #include <string.h>
 
 /* Прототипы приватных функций -----------------------------------------------*/
-static bool prv_WriteBlock ( void* buf, size_t blockSize, uint16_t blockAdr );
-static bool prv_ReadBlock ( void* buf, size_t blockSize, uint16_t blockAdr );
 static bool prv_SetAddress ( uint16_t adr );
 
 
@@ -30,102 +28,72 @@ void Fram_Init()
 }
 
 /**
- *	@brief	Запись в энергонезависимую память по указанному адресу одного байта.
- *	@param	uint8_t data - записываемый байт
- *			uint16_t adr - адрес в энергонезависимой памяти
- *	@return	bool - результат выполнения функции:
- *			true в случае успеха
- *			false в случае ошибки
+ *	@brief	Тестирование ячеек энергонезависимой памяти
+ *			ВНИМАНИЕ. Выполнение функции занимает продолжительное время
+ *	@param	void
+ *	@return	int 0 - успешное тестирование
+ *			int (-1) - ошибка тестирования
  */
-bool Fram_WriteByte(uint8_t data, uint16_t adr)
+int Fram_Test()
 {
-	return prv_WriteBlock(&data, sizeof(uint8_t), adr);
+	uint16_t i;
+	uint8_t data, readData;
+
+	for (i = 0; i < FRAM_SIZE; ++i) {
+		Fram_ReadBlock(&data, sizeof(uint8_t), i);
+		data = ~data;
+		Fram_WriteBlock(&data, sizeof(uint8_t), i);
+		Fram_ReadBlock(&readData, sizeof(uint8_t), i);
+		if (data != readData)	{
+			return -1;
+		}
+	}
+	return 0;
 }
 
 /**
- *	@brief	Запись в энергонезависимую память по указанному адресу двух байт.
+ *	@brief	Определение размера энергонезависимой памяти. Во все возможные ячейки
+ *			записывается нуль. В нулевую ячейку записывается маркер mark.
+ *			Начиная с первой ячейки последовательным чтением ищется маркер
+ *			ВНИМАНИЕ. Выполнение функции занимает продолжительное время
+ *	@param	void
+ *	@return	int количество ячеек памяти
+ *			int (-1) - ошибка, маркер не найден.
  */
-bool Fram_WriteDoubleByte(uint16_t data, uint16_t adr)
+int Fram_CalculateSize()
 {
-	return prv_WriteBlock(&data, sizeof(uint16_t), adr);
+	uint8_t mark = 0xB0;
+	uint8_t data = 0xA0;
+	uint16_t i = 0;
+
+	for (i = 0; i < 0xFFFF; ++i) {
+		Fram_WriteBlock(&data, sizeof(uint8_t), i);
+	}
+
+	Fram_WriteBlock(&mark, sizeof(uint8_t), 0);
+
+	for (i = 1; i < 0xFFFF; ++i) {
+		Fram_ReadBlock(&data, sizeof(uint8_t), i);
+		if (data == mark)	{
+			return i;
+		}
+	}
+	return -1;
 }
 
 /**
- *	@brief	Запись в энергонезависимую память по указанному адресу четырех байт.
+ *	@brief	Заполнение ячеек памяти данными data
+ *			ВНИМАНИЕ. Выполнение функции занимает продолжительное время
+ *	@param	uint8_t data - заполняющие данные
+ *	@return	void
  */
-bool Fram_WriteFourByte(uint32_t data, uint16_t adr)
+void Fram_Memset(uint8_t data)
 {
-	return prv_WriteBlock(&data, sizeof(uint32_t), adr);
+	uint16_t i = 0;
+	for (i = 0; i < FRAM_SIZE; ++i) {
+		Fram_WriteBlock(&data, sizeof(uint8_t), i);
+	}
 }
-
-/**
- *	@brief	Запись в энергонезависимую память по указанному адресу переменной
- *			типа float.
- */
-bool Fram_WriteFloat(float data, uint16_t adr)
-{
-	return prv_WriteBlock(&data, sizeof(float), adr);
-}
-
-/**
- *	@brief	Запись в энергонезависимую память по указанному адресу переменной
- *			типа double.
- */
-bool Fram_WriteDouble(double data, uint16_t adr)
-{
-	return prv_WriteBlock(&data, sizeof(double), adr);
-}
-
-/**
- *	@brief	Чтение из энергонезависимой памяти по указанному адресу одного байта.
- *	@param	uint8_t *data - указатель на переменную, в которую будет помещен
- *							результат чтения
- *			uint16_t adr - адрес в энергонезависимой памяти
- *	@return	bool - результат выполнения функции:
- *			true в случае успеха
- *			false в случае ошибки
- */
-bool Fram_ReadByte(uint8_t *data, uint16_t adr)
-{
-	return prv_ReadBlock(data, sizeof(uint8_t), adr);
-}
-
-/**
- *	@brief	Чтение из энергонезависимой памяти по указанному адресу двух байт.
- */
-bool Fram_ReadDoubleByte(uint16_t *data, uint16_t adr)
-{
-	return prv_ReadBlock((uint8_t*)data, sizeof(uint16_t), adr);
-}
-
-/**
- *	@brief	Чтение из энергонезависимой памяти по указанному адресу четырех байт.
- */
-bool Fram_ReadFourByte(uint32_t *data, uint16_t adr)
-{
-	return prv_ReadBlock((uint8_t*)data, sizeof(uint32_t), adr);
-}
-
-/**
- *	@brief	Чтение из энергонезависимой памяти по указанному адресу переменной
- *			типа float
- */
-bool Fram_ReadFloat(float *data, uint16_t adr)
-{
-	return prv_ReadBlock((uint8_t*)data, sizeof(float), adr);
-}
-
-/**
- *	@brief	Чтение из энергонезависимой памяти по указанному адресу переменной
- *			типа double
- */
-bool Fram_ReadDouble(double *data, uint16_t adr)
-{
-	return prv_ReadBlock((uint8_t*)data, sizeof(double), adr);
-}
-
-
-/* Приватные функции ---------------------------------------------------------*/
 
 /**
  *	@brief	Запись в энергонезависимую память по указанному адресу
@@ -138,7 +106,7 @@ bool Fram_ReadDouble(double *data, uint16_t adr)
  *			true в случае успеха
  *			false в случае ошибки
  */
-static bool prv_WriteBlock ( void* buf, size_t blockSize, uint16_t blockAdr )
+bool Fram_WriteBlock ( void* buf, size_t blockSize, uint16_t blockAdr )
 {
 	assert_param(blockSize <= MAX_BLOCK_SIZE);			// максимальный размер блока - 4 байта
 														// ибо больше не требуется
@@ -166,7 +134,7 @@ static bool prv_WriteBlock ( void* buf, size_t blockSize, uint16_t blockAdr )
  *			true в случае успеха
  *			false в случае ошибки
  */
-static bool prv_ReadBlock ( void* buf, size_t blockSize, uint16_t blockAdr )
+bool Fram_ReadBlock ( void* buf, size_t blockSize, uint16_t blockAdr )
 {
 	bool result;
 	result = prv_SetAddress( blockAdr );				// сначала устанавливаем адрес чтения
@@ -176,6 +144,102 @@ static bool prv_ReadBlock ( void* buf, size_t blockSize, uint16_t blockAdr )
 	return result;
 }
 
+/**
+ *	@brief	Запись в энергонезависимую память по указанному адресу одного байта.
+ *	@param	uint8_t data - записываемый байт
+ *			uint16_t adr - адрес в энергонезависимой памяти
+ *	@return	bool - результат выполнения функции:
+ *			true в случае успеха
+ *			false в случае ошибки
+ */
+bool Fram_WriteByte(uint8_t data, uint16_t adr)
+{
+	return Fram_WriteBlock(&data, sizeof(uint8_t), adr);
+}
+
+/**
+ *	@brief	Запись в энергонезависимую память по указанному адресу двух байт.
+ */
+bool Fram_WriteDoubleByte(uint16_t data, uint16_t adr)
+{
+	return Fram_WriteBlock(&data, sizeof(uint16_t), adr);
+}
+
+/**
+ *	@brief	Запись в энергонезависимую память по указанному адресу четырех байт.
+ */
+bool Fram_WriteFourByte(uint32_t data, uint16_t adr)
+{
+	return Fram_WriteBlock(&data, sizeof(uint32_t), adr);
+}
+
+/**
+ *	@brief	Запись в энергонезависимую память по указанному адресу переменной
+ *			типа float.
+ */
+bool Fram_WriteFloat(float data, uint16_t adr)
+{
+	return Fram_WriteBlock(&data, sizeof(float), adr);
+}
+
+/**
+ *	@brief	Запись в энергонезависимую память по указанному адресу переменной
+ *			типа double.
+ */
+bool Fram_WriteDouble(double data, uint16_t adr)
+{
+	return Fram_WriteBlock(&data, sizeof(double), adr);
+}
+
+/**
+ *	@brief	Чтение из энергонезависимой памяти по указанному адресу одного байта.
+ *	@param	uint8_t *data - указатель на переменную, в которую будет помещен
+ *							результат чтения
+ *			uint16_t adr - адрес в энергонезависимой памяти
+ *	@return	bool - результат выполнения функции:
+ *			true в случае успеха
+ *			false в случае ошибки
+ */
+bool Fram_ReadByte(uint8_t *data, uint16_t adr)
+{
+	return Fram_ReadBlock(data, sizeof(uint8_t), adr);
+}
+
+/**
+ *	@brief	Чтение из энергонезависимой памяти по указанному адресу двух байт.
+ */
+bool Fram_ReadDoubleByte(uint16_t *data, uint16_t adr)
+{
+	return Fram_ReadBlock((uint8_t*)data, sizeof(uint16_t), adr);
+}
+
+/**
+ *	@brief	Чтение из энергонезависимой памяти по указанному адресу четырех байт.
+ */
+bool Fram_ReadFourByte(uint32_t *data, uint16_t adr)
+{
+	return Fram_ReadBlock((uint8_t*)data, sizeof(uint32_t), adr);
+}
+
+/**
+ *	@brief	Чтение из энергонезависимой памяти по указанному адресу переменной
+ *			типа float
+ */
+bool Fram_ReadFloat(float *data, uint16_t adr)
+{
+	return Fram_ReadBlock((uint8_t*)data, sizeof(float), adr);
+}
+
+/**
+ *	@brief	Чтение из энергонезависимой памяти по указанному адресу переменной
+ *			типа double
+ */
+bool Fram_ReadDouble(double *data, uint16_t adr)
+{
+	return Fram_ReadBlock((uint8_t*)data, sizeof(double), adr);
+}
+
+/* Приватные функции ---------------------------------------------------------*/
 /**
  *	@brief	Установить указатель на считываемые данные в энергонезависимой памяти
  *	@param	uint16_t blockAdr - адрес в энергонезависимой памяти

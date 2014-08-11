@@ -14,8 +14,15 @@
 
 #define FRAM_ADDRESS		0xA0
 #define MAX_BLOCK_SIZE		4
+#define FRAM_SIZE			0x2000
 
 void Fram_Init();
+int  Fram_Test();
+int  Fram_CalculateSize();
+void Fram_Memset(uint8_t data);
+
+bool Fram_WriteBlock ( void* buf, size_t blockSize, uint16_t blockAdr );
+bool Fram_ReadBlock ( void* buf, size_t blockSize, uint16_t blockAdr );
 
 bool Fram_WriteByte(uint8_t data, uint16_t adr);
 bool Fram_WriteDoubleByte(uint16_t data, uint16_t adr);
