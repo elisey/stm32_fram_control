@@ -1,25 +1,37 @@
-#include <stdint.h>
 #include "journal.h"
 #include "memory_rewrite_handler.h"
 
+/*----------------------------------------------------------------------------
+ * Прототипы локальных функций
+ ----------------------------------------------------------------------------*/
 void prv_LoadJournalHead (journalSettings_t *this, journalHead_t *ptrJournalHead);
 void prv_SaveJournalHead(journalSettings_t *this, const journalHead_t *ptrJournalHead);
 uint16_t prv_GetItemIndexByLastItemOffset (journalSettings_t *this, uint16_t itemNumber);
 void prv_LoadJournalItem (journalSettings_t *this, void *journalItem, uint16_t itemIndex);
 void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint16_t itemIndex);
-int prv_CheckJournal(journalSettings_t *this);
+bool prv_CheckJournal(journalSettings_t *this);
 
+/*----------------------------------------------------------------------------
+ * Глобальные функции
+ ----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ * brief:	Инициализация журнала this
+ ----------------------------------------------------------------------------*/
 void Journal_Init (journalSettings_t *this, uint16_t elementSize, uint16_t offset, uint16_t maxNumOfItems)
 {
 	this->elementSize = elementSize;
 	this->offset = offset;
 	this->maxNumOfItems = maxNumOfItems;
 
-	if (prv_CheckJournal(this) == -1)	{
+	if (prv_CheckJournal(this) == false)	{
 		Journal_DeleteJournal(this);
 	}
 }
 
+/*----------------------------------------------------------------------------
+ * brief:	Взять количество записанных элементов в журнале
+ ----------------------------------------------------------------------------*/
 uint16_t Journal_GetNumberOfItems (journalSettings_t *this)
 {
 	journalHead_t journalHead;
@@ -27,7 +39,11 @@ uint16_t Journal_GetNumberOfItems (journalSettings_t *this)
 	return journalHead.numberOfItems;
 }
 
-int Journal_ReadItem (journalSettings_t *this, void *journalItem, uint16_t itemNumber)
+/*----------------------------------------------------------------------------
+ * brief:	Прочитать одну запись из журнала. itemNumber - относительное
+ * 			смещение относиельно последней записи.
+ ----------------------------------------------------------------------------*/
+bool Journal_ReadItem (journalSettings_t *this, void *journalItem, uint16_t itemNumber)
 {
 	uint16_t itemIndex = prv_GetItemIndexByLastItemOffset(this, itemNumber);
 	if (itemIndex == -1)	{
@@ -38,6 +54,9 @@ int Journal_ReadItem (journalSettings_t *this, void *journalItem, uint16_t itemN
 	return 0;
 }
 
+/*----------------------------------------------------------------------------
+ * brief:	Записать запись в журнал в конец
+ ----------------------------------------------------------------------------*/
 void Journal_WriteItem (journalSettings_t *this, void *journalItem)
 {
 	journalHead_t journalHead;
@@ -56,6 +75,9 @@ void Journal_WriteItem (journalSettings_t *this, void *journalItem)
 	prv_SaveJournalHead(this, &journalHead);
 }
 
+/*----------------------------------------------------------------------------
+ * brief:	Отчистить журнал
+ ----------------------------------------------------------------------------*/
 void Journal_DeleteJournal (journalSettings_t *this)
 {
 	journalHead_t journalHead;
@@ -68,6 +90,13 @@ void Journal_DeleteJournal (journalSettings_t *this)
 	prv_SaveJournalHead(this, &journalHead);
 }
 
+/*----------------------------------------------------------------------------
+ * Приватные функции
+ ----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+ * brief:	Загрузить заголовок журнала
+ ----------------------------------------------------------------------------*/
 void prv_LoadJournalHead(journalSettings_t *this, journalHead_t *ptrJournalHead)
 {
 	uint16_t journalOffset;
@@ -76,6 +105,9 @@ void prv_LoadJournalHead(journalSettings_t *this, journalHead_t *ptrJournalHead)
 	MemoryRewriteHandler_TryReadBlock( (uint8_t*)ptrJournalHead, sizeof (journalHead_t), journalOffset);
 }
 
+/*----------------------------------------------------------------------------
+ * brief:	Сохранить заголовок журнала
+ ----------------------------------------------------------------------------*/
 void prv_SaveJournalHead(journalSettings_t *this, const journalHead_t *ptrJournalHead)
 {
 	uint16_t journalOffset;
@@ -125,6 +157,9 @@ void prv_LoadJournalItem(journalSettings_t *this, void *journalItem, uint16_t it
 	MemoryRewriteHandler_TryReadBlock( (uint8_t*)journalItem, size, adr );
 }
 
+/*----------------------------------------------------------------------------
+ * brief:	Сохранить одну запись журнала
+ ----------------------------------------------------------------------------*/
 void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint16_t itemIndex)
 {
 	uint16_t size = this->elementSize;
@@ -133,7 +168,10 @@ void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint1
 	MemoryRewriteHandler_TryReadBlock( (uint8_t*)journalItem, size, adr );
 }
 
-int prv_CheckJournal(journalSettings_t *this)
+/*----------------------------------------------------------------------------
+ * brief:	Проверить журнал на валидность
+ ----------------------------------------------------------------------------*/
+bool prv_CheckJournal(journalSettings_t *this)
 {
 	journalHead_t journalHead;
 	prv_LoadJournalHead(this, &journalHead);

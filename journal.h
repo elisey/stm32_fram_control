@@ -1,7 +1,7 @@
 #pragma once
 
-
 #include <stdint.h>
+#include <stdbool.h>
 
 #define journalVALID_BYTE		0xA0
 
@@ -19,6 +19,6 @@ typedef struct	{
 
 void Journal_Init (journalSettings_t *ptrJournalSettings, uint16_t elementSize, uint16_t offset, uint16_t maxNumOfItems);
 uint16_t Journal_GetNumberOfItems (journalSettings_t *ptrJournalSettings);
-int Journal_ReadItem (journalSettings_t *ptrJournalSettings, void *journalItem, uint16_t itemNumber);
+bool Journal_ReadItem (journalSettings_t *ptrJournalSettings, void *journalItem, uint16_t itemNumber);
 void Journal_WriteItem (journalSettings_t *ptrJournalSettings, void *journalItem);
 void Journal_DeleteJournal (journalSettings_t *ptrJournalSettings);
