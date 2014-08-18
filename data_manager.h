@@ -1,24 +1,20 @@
 #pragma once
 
 #include "stddef.h"
-#include "stdint.h"
 #include "data_manager_config.h"
 
-#define LOAD_DEFAULT_DATA		1
-
-
+#define data_managerLOAD_DEFAULT_DATA		1
 
 DataManager_Data_t DataManager_Data;
-#ifdef LOAD_DEFAULT_DATA
+#ifdef data_managerLOAD_DEFAULT_DATA
 DataManager_Data_t DataManager_DefaultData;
 #endif
 
 //	Распределение адресов таблиц в энергонезависимой памяти
-#define DataManager_MainTable     	0
-#define DataManager_InvertTable    	(DataManager_MainTable + sizeof(DataManager_Data_t))
-#define DataManager_EndOfTables   	(DataManager_InvertTable + sizeof(DataManager_Data_t))
-
-
+#define data_managerMAIN_TABLE_OFFSET     	0
+#define data_managerINVERT_TABLE_OFFSET    	(data_managerMAIN_TABLE_OFFSET		+ sizeof(DataManager_Data_t))
+#define data_managerEND_OF_TABLES   		(data_managerINVERT_TABLE_OFFSET	+ sizeof(DataManager_Data_t))
+#define data_managerSIZE_OF_DATA			data_managerEND_OF_TABLES			- data_managerMAIN_TABLE_OFFSET
 
 #define SIZE_OF_MEMBER(s,m) 		((size_t)sizeof(s.m))
 

@@ -1,7 +1,7 @@
 #include "data_manager_config.h"
 #include "data_manager.h"
 
-#ifdef LOAD_DEFAULT_DATA
+#ifdef data_managerLOAD_DEFAULT_DATA
 void DataManager_InitDefaultData()
 {
 	DataManager_DefaultData.data8 = 77;
