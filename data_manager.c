@@ -27,17 +27,17 @@ void DataManager_WriteBlock(void *buf, size_t blockSize, uint16_t blockAdr)
 	MemoryRewriteHandler_TryWriteBlock(buf, blockSize, blockAdr + DataManager_MainTable);
 
 	int i;
-	uint8_t invertBuf[MAX_BLOCK_SIZE];
+	uint8_t invertBuf[fram_driverMAX_BLOCK_SIZE]; 	//FIXME Межмодульная зависимость. Убрать
 	for (i = 0; i < blockSize; ++i) {
-		invertBuf[i] = ~((uint8_t*)(buf))[i]; //FIXME
+		invertBuf[i] = ~((uint8_t*)(buf))[i]; 		//FIXME Абракадабра. Улучшить читаемость
 	}
 	MemoryRewriteHandler_TryWriteBlock(invertBuf, blockSize, blockAdr + DataManager_InvertTable);
 }
 
 void DataManager_ReadBlock(void *buf, size_t blockSize, uint16_t blockAdr)
 {
-	uint8_t straightBuf[MAX_BLOCK_SIZE];
-	uint8_t invertBuf[MAX_BLOCK_SIZE];
+	uint8_t straightBuf[fram_driverMAX_BLOCK_SIZE];			//FIXME Межмодульная зависимость. Убрать
+	uint8_t invertBuf[fram_driverMAX_BLOCK_SIZE];				//FIXME Межмодульная зависимость. Убрать
 
 	MemoryRewriteHandler_TryReadBlock(straightBuf, blockSize, blockAdr + DataManager_MainTable);
 	MemoryRewriteHandler_TryReadBlock(invertBuf, blockSize, blockAdr + DataManager_InvertTable);
