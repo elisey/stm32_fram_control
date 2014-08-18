@@ -6,7 +6,7 @@
  ----------------------------------------------------------------------------*/
 void prv_LoadJournalHead (journalSettings_t *this, journalHead_t *ptrJournalHead);
 void prv_SaveJournalHead(journalSettings_t *this, const journalHead_t *ptrJournalHead);
-uint16_t prv_GetItemIndexByLastItemOffset (journalSettings_t *this, uint16_t itemNumber);
+int16_t prv_GetItemIndexByLastItemOffset (journalSettings_t *this, uint16_t itemNumber);
 void prv_LoadJournalItem (journalSettings_t *this, void *journalItem, uint16_t itemIndex);
 void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint16_t itemIndex);
 bool prv_CheckJournal(journalSettings_t *this);
@@ -45,13 +45,13 @@ uint16_t Journal_GetNumberOfItems (journalSettings_t *this)
  ----------------------------------------------------------------------------*/
 bool Journal_ReadItem (journalSettings_t *this, void *journalItem, uint16_t itemNumber)
 {
-	uint16_t itemIndex = prv_GetItemIndexByLastItemOffset(this, itemNumber);
+	int16_t itemIndex = prv_GetItemIndexByLastItemOffset(this, itemNumber);
 	if (itemIndex == -1)	{
-		return -1;
+		return false;
 	}
 	prv_LoadJournalItem(this, journalItem, itemIndex);
 
-	return 0;
+	return true;
 }
 
 /*----------------------------------------------------------------------------
@@ -66,11 +66,9 @@ void Journal_WriteItem (journalSettings_t *this, void *journalItem)
 	if (journalHead.lastItemIndex >= this->maxNumOfItems)	{
 		journalHead.lastItemIndex = 0;
 	}
-	journalHead.numberOfItems++;
 	if (journalHead.numberOfItems < this->maxNumOfItems)	{
 		journalHead.numberOfItems++;
 	}
-
 	prv_SaveJournalItem(this, journalItem, journalHead.lastItemIndex);
 	prv_SaveJournalHead(this, &journalHead);
 }
@@ -124,7 +122,7 @@ void prv_SaveJournalHead(journalSettings_t *this, const journalHead_t *ptrJourna
  * 			не будет. Иначе будет переход через нуль, а следовательно нужно
  * 			учесть максимальный размер в элементах кольцевого буфера.
  ----------------------------------------------------------------------------*/
-uint16_t prv_GetItemIndexByLastItemOffset(journalSettings_t *this, uint16_t itemNumber)
+int16_t prv_GetItemIndexByLastItemOffset(journalSettings_t *this, uint16_t itemNumber)
 {
 	journalHead_t journalHead;
 	prv_LoadJournalHead(this, &journalHead);
@@ -152,7 +150,7 @@ uint16_t prv_GetItemIndexByLastItemOffset(journalSettings_t *this, uint16_t item
 void prv_LoadJournalItem(journalSettings_t *this, void *journalItem, uint16_t itemIndex)
 {
 	uint16_t size = this->elementSize;
-	uint16_t adr = this->elementSize * itemIndex;
+	uint16_t adr = this->elementSize * itemIndex + sizeof(journalHead_t);
 
 	MemoryRewriteHandler_TryReadBlock( (uint8_t*)journalItem, size, adr );
 }
@@ -163,7 +161,7 @@ void prv_LoadJournalItem(journalSettings_t *this, void *journalItem, uint16_t it
 void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint16_t itemIndex)
 {
 	uint16_t size = this->elementSize;
-	uint16_t adr = this->elementSize * itemIndex;
+	uint16_t adr = this->elementSize * itemIndex + sizeof(journalHead_t);
 
 	MemoryRewriteHandler_TryWriteBlock( (uint8_t*)journalItem, size, adr );
 }
