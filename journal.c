@@ -7,7 +7,7 @@ void prv_SaveJournalHead(journalSettings_t *this, const journalHead_t *ptrJourna
 uint16_t prv_GetItemIndexByLastItemOffset (journalSettings_t *this, uint16_t itemNumber);
 void prv_LoadJournalItem (journalSettings_t *this, void *journalItem, uint16_t itemIndex);
 void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint16_t itemIndex);
-
+int prv_CheckJournal(journalSettings_t *this);
 
 void Journal_Init (journalSettings_t *this, uint16_t elementSize, uint16_t offset, uint16_t maxNumOfItems)
 {
@@ -15,7 +15,9 @@ void Journal_Init (journalSettings_t *this, uint16_t elementSize, uint16_t offse
 	this->offset = offset;
 	this->maxNumOfItems = maxNumOfItems;
 
-	//TODO Прочитать Заголовок журнала в энергонезависимой памяти.
+	if (prv_CheckJournal(this) == -1)	{
+		Journal_DeleteJournal(this);
+	}
 }
 
 uint16_t Journal_GetNumberOfItems (journalSettings_t *this)
@@ -52,13 +54,18 @@ void Journal_WriteItem (journalSettings_t *this, void *journalItem)
 
 	prv_SaveJournalItem(this, journalItem, journalHead.lastItemIndex);
 	prv_SaveJournalHead(this, &journalHead);
-
-
 }
 
 void Journal_DeleteJournal (journalSettings_t *this)
 {
+	journalHead_t journalHead;
+	prv_LoadJournalHead(this, &journalHead);
 
+	journalHead.lastItemIndex = 0;
+	journalHead.numberOfItems = 0;
+	journalHead.isValid = journalVALID_BYTE;
+
+	prv_SaveJournalHead(this, &journalHead);
 }
 
 void prv_LoadJournalHead(journalSettings_t *this, journalHead_t *ptrJournalHead)
@@ -124,4 +131,15 @@ void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint1
 	uint16_t adr = this->elementSize * itemIndex;
 
 	MemoryRewriteHandler_TryReadBlock( (uint8_t*)journalItem, size, adr );
+}
+
+int prv_CheckJournal(journalSettings_t *this)
+{
+	journalHead_t journalHead;
+	prv_LoadJournalHead(this, &journalHead);
+
+	if (journalHead.isValid != journalVALID_BYTE)	{
+		return -1;
+	}
+	return 0;
 }

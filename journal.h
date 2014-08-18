@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#define journalVALID_BYTE		0xA0
 
 typedef struct	{
 		uint16_t elementSize;
