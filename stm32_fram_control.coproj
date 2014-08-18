@@ -4,7 +4,7 @@
     <Device manufacturerId="9" manufacturerName="ST" chipId="257" chipName="STM32F100RB" boardId="" boardName=""/>
     <BuildOption>
       <Compile>
-        <Option name="OptimizationLevel" value="4"/>
+        <Option name="OptimizationLevel" value="0"/>
         <Option name="UseFPU" value="0"/>
         <Option name="UserEditCompiler" value=""/>
         <Option name="SupportCPlusplus" value="0"/>
@@ -77,6 +77,7 @@
   <Files>
     <File name="cmsis_boot/startup/startup_stm32f10x_md_vl.c" path="cmsis_boot/startup/startup_stm32f10x_md_vl.c" type="1"/>
     <File name="cmsis_boot/system_stm32f10x.c" path="cmsis_boot/system_stm32f10x.c" type="1"/>
+    <File name="journal.c" path="journal.c" type="1"/>
     <File name="i2c_soft.c" path="i2c_soft.c" type="1"/>
     <File name="cmsis/core_cmInstr.h" path="cmsis/core_cmInstr.h" type="1"/>
     <File name="memory_rewrite_handler.c" path="memory_rewrite_handler.c" type="1"/>
@@ -85,8 +86,8 @@
     <File name="cmsis_boot" path="" type="2"/>
     <File name="stm_lib/src/stm32f10x_rcc.c" path="stm_lib/src/stm32f10x_rcc.c" type="1"/>
     <File name="cmsis_boot/startup" path="" type="2"/>
-    <File name="data_manager_config.h" path="data_manager_config.h" type="1"/>
     <File name="fram_driver.c" path="fram_driver.c" type="1"/>
+    <File name="data_manager_config.h" path="data_manager_config.h" type="1"/>
     <File name="cmsis/core_cmFunc.h" path="cmsis/core_cmFunc.h" type="1"/>
     <File name="memory_rewrite_handler.h" path="memory_rewrite_handler.h" type="1"/>
     <File name="cmsis_boot/stm32f10x.h" path="cmsis_boot/stm32f10x.h" type="1"/>
@@ -102,7 +103,9 @@
     <File name="stm_lib/src/stm32f10x_gpio.c" path="stm_lib/src/stm32f10x_gpio.c" type="1"/>
     <File name="stm_lib/inc" path="" type="2"/>
     <File name="stm_lib/inc/stm32f10x_gpio.h" path="stm_lib/inc/stm32f10x_gpio.h" type="1"/>
-    <File name="main.c" path="main.c" type="1"/>
     <File name="i2c_soft.h" path="i2c_soft.h" type="1"/>
+    <File name="journal.h" path="journal.h" type="1"/>
+    <File name="main.c" path="main.c" type="1"/>
+    <File name="journal_test.c" path="journal_test.c" type="1"/>
   </Files>
 </Project>

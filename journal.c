@@ -165,7 +165,7 @@ void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint1
 	uint16_t size = this->elementSize;
 	uint16_t adr = this->elementSize * itemIndex;
 
-	MemoryRewriteHandler_TryReadBlock( (uint8_t*)journalItem, size, adr );
+	MemoryRewriteHandler_TryWriteBlock( (uint8_t*)journalItem, size, adr );
 }
 
 /*----------------------------------------------------------------------------
@@ -177,7 +177,7 @@ bool prv_CheckJournal(journalSettings_t *this)
 	prv_LoadJournalHead(this, &journalHead);
 
 	if (journalHead.isValid != journalVALID_BYTE)	{
-		return -1;
+		return false;
 	}
-	return 0;
+	return true;
 }
