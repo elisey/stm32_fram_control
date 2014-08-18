@@ -24,7 +24,7 @@ static bool prv_SetAddress ( uint16_t adr );
  */
 void Fram_Init()
 {
-	i2cSoft_Init();
+	i2c_soft_Init();
 }
 
 /**
@@ -119,7 +119,7 @@ bool Fram_WriteBlock ( void* buf, size_t blockSize, uint16_t blockAdr )
 	data[0] = (uint8_t) (blockAdr >> 8);
 	data[1] = (uint8_t) (blockAdr & 0xFF);
 														// и отправляем его
-	result = i2cSoft_WriteBuffer( FRAM_ADDRESS, data, blockSize + 2 );
+	result = i2c_soft_WriteBuffer( FRAM_ADDRESS, data, blockSize + 2 );
 	return result;
 }
 
@@ -140,7 +140,7 @@ bool Fram_ReadBlock ( void* buf, size_t blockSize, uint16_t blockAdr )
 	result = prv_SetAddress( blockAdr );				// сначала устанавливаем адрес чтения
 	if ( result == false )
 		return false;
-	result = i2cSoft_ReadBuffer( FRAM_ADDRESS, buf, blockSize );	// читаем данные
+	result = i2c_soft_ReadBuffer( FRAM_ADDRESS, buf, blockSize );	// читаем данные
 	return result;
 }
 
@@ -158,6 +158,6 @@ static bool prv_SetAddress ( uint16_t adr )
 	uint8_t buf[2];
 	buf[0] = (uint8_t) (adr >> 8);
 	buf[1] = (uint8_t) (adr & 0x00FF);
-	result = i2cSoft_WriteBuffer( FRAM_ADDRESS, buf, 2 );
+	result = i2c_soft_WriteBuffer( FRAM_ADDRESS, buf, 2 );
 	return result;
 }

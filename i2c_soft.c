@@ -1,38 +1,54 @@
 ﻿/*
  * author:	Елисей Равнюшкин
  * date:	08.04.2014	19:00:00
- * file:	i2cSoft.c
+ * file:	i2c_soft.c
  * Софтовая реализация I2C
  */
 
 #include "i2c_soft.h"
 #include <stdbool.h>
 #include "stm32f10x.h"
-//--------------------Прототипы локальных функций-----------------------------
-static void i2cSoft_Delay ();
-static bool i2cSoft_Start ();
-static void i2cSoft_Stop ();
-static void i2cSoft_Ack ();
-static void i2cSoft_NoAck ();
-static bool i2cSoft_WaitAck ();
-static void i2cSoft_PutByte ( uint8_t data );
-static uint8_t i2cSoft_GetByte ();
 
-//---------------------Глобальные функции--------------------------------------
+/*----------------------------------------------------------------------------
+ * Макросы управления портами
+ ----------------------------------------------------------------------------*/
+#define SCLH						i2c_softGPIO->BSRR = i2c_softGPIO_Pin_SCL
+#define SCLL						i2c_softGPIO->BRR = i2c_softGPIO_Pin_SCL
+
+#define SDAH						i2c_softGPIO->BSRR = i2c_softGPIO_Pin_SDA
+#define SDAL						i2c_softGPIO->BRR = i2c_softGPIO_Pin_SDA
+#define SCLread						i2c_softGPIO->IDR & i2c_softGPIO_Pin_SCL
+#define SDAread						i2c_softGPIO->IDR & i2c_softGPIO_Pin_SDA
+
+/*----------------------------------------------------------------------------
+ * Прототипы локальных функций
+ ----------------------------------------------------------------------------*/
+static void i2cSoft_Delay();
+static bool i2cSoft_Start();
+static void i2cSoft_Stop();
+static void i2cSoft_Ack();
+static void i2cSoft_NoAck();
+static bool i2cSoft_WaitAck();
+static void i2cSoft_PutByte(uint8_t data);
+static uint8_t i2cSoft_GetByte();
+
+/*----------------------------------------------------------------------------
+ * Глобальные функции
+ ----------------------------------------------------------------------------*/
 
 /**
  *	@brief	Инициализация модуля i2c, а именно портов ввода/вывода
  *	@param	void
  *	@return	void
  */
-void i2cSoft_Init ()
+void i2c_soft_Init()
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
-	RCC_APB2PeriphClockCmd( I2C_RCC_APB2Periph_GPIO, ENABLE );
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_SCL | GPIO_Pin_SDA;
+	RCC_APB2PeriphClockCmd(i2c_softRCC_APB2Periph_GPIO, ENABLE);
+	GPIO_InitStructure.GPIO_Pin = i2c_softGPIO_Pin_SCL | i2c_softGPIO_Pin_SDA;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
-	GPIO_Init( I2C_GPIO, &GPIO_InitStructure );
+	GPIO_Init(i2c_softGPIO, &GPIO_InitStructure);
 }
 
 /**
@@ -46,23 +62,23 @@ void i2cSoft_Init ()
  *			true в случае успеха
  *			false в случае ошибки
  */
-int i2cSoft_ReadBuffer ( uint8_t chipAddress, void *buffer, uint32_t sizeOfBuffer )
+int i2c_soft_ReadBuffer(uint8_t chipAddress, void *buffer, uint32_t sizeOfBuffer)
 {
-	if ( !i2cSoft_Start() )
+	if (!i2cSoft_Start())
 		return false;
 
-	i2cSoft_PutByte( chipAddress + 1 );
-	if ( !i2cSoft_WaitAck() ) {
+	i2cSoft_PutByte(chipAddress + 1);
+	if (!i2cSoft_WaitAck()) {
 		i2cSoft_Stop();
 		return false;
 	}
 
-	while ( sizeOfBuffer != 0 ) {
-		*(uint8_t*)buffer = i2cSoft_GetByte();
+	while (sizeOfBuffer != 0) {
+		*(uint8_t*) buffer = i2cSoft_GetByte();
 
 		buffer++;
 		sizeOfBuffer--;
-		if ( sizeOfBuffer == 0 ) {
+		if (sizeOfBuffer == 0) {
 			i2cSoft_NoAck();
 			break;
 		}
@@ -84,20 +100,20 @@ int i2cSoft_ReadBuffer ( uint8_t chipAddress, void *buffer, uint32_t sizeOfBuffe
  *			true в случае успеха
  *			false в случае ошибки
  */
-int i2cSoft_WriteBuffer ( uint8_t chipAddress, void *buffer, uint32_t sizeOfBuffer )
+int i2c_soft_WriteBuffer(uint8_t chipAddress, void *buffer, uint32_t sizeOfBuffer)
 {
-	if ( !i2cSoft_Start() )
+	if (!i2cSoft_Start())
 		return false;
 
-	i2cSoft_PutByte( chipAddress );
-	if ( !i2cSoft_WaitAck() ) {
+	i2cSoft_PutByte(chipAddress);
+	if (!i2cSoft_WaitAck()) {
 		i2cSoft_Stop();
 		return false;
 	}
 
-	while ( sizeOfBuffer != 0 ) {
-		i2cSoft_PutByte( *(uint8_t *)buffer );
-		if ( !i2cSoft_WaitAck() ) {
+	while (sizeOfBuffer != 0) {
+		i2cSoft_PutByte(*(uint8_t *) buffer);
+		if (!i2cSoft_WaitAck()) {
 			i2cSoft_Stop();
 			return false;
 		}
@@ -109,17 +125,19 @@ int i2cSoft_WriteBuffer ( uint8_t chipAddress, void *buffer, uint32_t sizeOfBuff
 	return true;
 }
 
-//---------------------------ЛОКАЛЬНЫЕ ФУНКЦИИ-------------------------------
+/*----------------------------------------------------------------------------
+ * локальные функции
+ ----------------------------------------------------------------------------*/
 
 /**
  *	@brief	Реализация простой задержки
  *	@param	void
  *	@return	void
  */
-static void i2cSoft_Delay ()
+static void i2cSoft_Delay()
 {
 	volatile uint16_t i = I2C_DELAY_VALUE;
-	while ( i ) {
+	while (i) {
 		i--;
 	}
 }
@@ -131,16 +149,16 @@ static void i2cSoft_Delay ()
  *			true в случае успеха
  *			false в случае ошибки
  */
-static bool i2cSoft_Start ()
+static bool i2cSoft_Start()
 {
 	SDAH;						// отпустить обе линии, на случай
 	SCLH;						// на случай, если они были прижаты
 	i2cSoft_Delay();
-	if ( !(SDAread) )			// если линия SDA прижата слейвом,
+	if (!(SDAread))			// если линия SDA прижата слейвом,
 		return false;			// то сформировать старт невозможно, выход с ошибкой
 	SDAL;						// прижимаем SDA к земле
 	i2cSoft_Delay();
-	if ( SDAread )				// если не прижалась, то шина неисправна
+	if (SDAread)				// если не прижалась, то шина неисправна
 		return false;			// выход с ошибкой
 	i2cSoft_Delay();
 	return true;				// старт успешно сформирован
@@ -153,7 +171,7 @@ static bool i2cSoft_Start ()
  *			true в случае успеха
  *			false в случае ошибки
  */
-static void i2cSoft_Stop ()
+static void i2cSoft_Stop()
 {
 	SCLL;						// последовательность для формирования Стопа
 	i2cSoft_Delay();
@@ -170,7 +188,7 @@ static void i2cSoft_Stop ()
  *	@param	void
  *	@return	void
  */
-static void i2cSoft_Ack ()
+static void i2cSoft_Ack()
 {
 	SCLL;
 	i2cSoft_Delay();
@@ -187,7 +205,7 @@ static void i2cSoft_Ack ()
  *	@param	void
  *	@return	void
  */
-static void i2cSoft_NoAck ()	//
+static void i2cSoft_NoAck()	//
 {
 	SCLL;
 	i2cSoft_Delay();
@@ -206,7 +224,7 @@ static void i2cSoft_NoAck ()	//
  *			true  - если ACK получен
  *			false - если ACK НЕ получен
  */
-static bool i2cSoft_WaitAck ()
+static bool i2cSoft_WaitAck()
 {
 	SCLL;
 	i2cSoft_Delay();
@@ -214,7 +232,7 @@ static bool i2cSoft_WaitAck ()
 	i2cSoft_Delay();
 	SCLH;						// делаем половину клика линией SCL
 	i2cSoft_Delay();
-	if ( SDAread ) {			// и проверяем, прижал ли слейв линию SDA
+	if (SDAread) {			// и проверяем, прижал ли слейв линию SDA
 		SCLL;
 		return false;
 	}
@@ -227,13 +245,13 @@ static bool i2cSoft_WaitAck ()
  *	@param	uint8_t data - байт данных для отправки
  *	@return	void
  */
-static void i2cSoft_PutByte ( uint8_t data )
+static void i2cSoft_PutByte(uint8_t data)
 {
 	uint8_t i = 8;				// нужно отправить 8 бит данных
-	while ( i-- ) {				// пока не отправили все биты
+	while (i--) {				// пока не отправили все биты
 		SCLL;					// прижимаем линию SCL к земле
 		i2cSoft_Delay();
-		if ( data & 0x80 )		// и выставляем на линии SDA нужный уровень
+		if (data & 0x80)		// и выставляем на линии SDA нужный уровень
 			SDAH;
 		else
 			SDAL;
@@ -250,19 +268,19 @@ static void i2cSoft_PutByte ( uint8_t data )
  *	@param	void
  *	@return	uint8_t - прочитанный байт
  */
-static uint8_t i2cSoft_GetByte ()
+static uint8_t i2cSoft_GetByte()
 {
 	volatile uint8_t i = 8;		// нужно отправить 8 бит данных
 	uint8_t data = 0;
 
 	SDAH;						// отпускаем линию SDA. управлять ей будет слейв
-	while ( i-- ) {				// пока не получили все биты
+	while (i--) {				// пока не получили все биты
 		data <<= 1;
 		SCLL;					// делаем клик линией SCL
 		i2cSoft_Delay();
 		SCLH;
 		i2cSoft_Delay();
-		if ( SDAread ) {		// читаем значение на линии SDA
+		if (SDAread) {		// читаем значение на линии SDA
 			data |= 0x01;
 		}
 	}
