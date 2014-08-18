@@ -1,7 +1,7 @@
 #pragma once
 #include "fram_driver.h"
 
-#define NUM_OF_TRYS_TO_LOAD     3
+#define memory_rewrite_handlerNUM_OF_TRYS_TO_LOAD     3
 
 //	Определение низкоуровневых функций для чтения/записи блоков
 //	Прототип функций должен быть:
@@ -15,7 +15,6 @@
 
 /* Определите эту функцию для обработки ошибок чтения/записи. */
 extern void MemoryRewriteHandler_ErrorHandler(int error);
-
 
 void MemoryRewriteHandler_Init();
 void MemoryRewriteHandler_TryWriteBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr);
