@@ -6,7 +6,7 @@
 
 #define LOAD_DEFAULT_DATA		1
 
-#define NUM_OF_TRYS_TO_LOAD     3
+
 
 DataManager_Data_t DataManager_Data;
 #ifdef LOAD_DEFAULT_DATA
@@ -18,16 +18,7 @@ DataManager_Data_t DataManager_DefaultData;
 #define DataManager_InvertTable    	(DataManager_MainTable + sizeof(DataManager_Data_t))
 #define DataManager_EndOfTables   	(DataManager_InvertTable + sizeof(DataManager_Data_t))
 
-//	Определение низкоуровневых функций для чтения/записи блоков
-//	Прототип функций должен быть:
-//	bool your_func ( void* buf, size_t blockSize, uint16_t blockAdr )
-#define Memory_WriteBlock			Fram_WriteBlock
-#define Memory_ReadBlock			Fram_ReadBlock
 
-//	Обработка ошибок чтения/записи
-#define DATA_MANAGER_ERR_WR			(-1)
-#define DATA_MANAGER_ERR_RD			(-2)
-#define DATA_MANAGER_ERR_CHK		(-3)
 
 #define SIZE_OF_MEMBER(s,m) 		((size_t)sizeof(s.m))
 
@@ -40,7 +31,3 @@ DataManager_Data_t DataManager_DefaultData;
 void DataManager_Init();
 void DataManager_WriteBlock(void *buf, size_t blockSize, uint16_t blockAdr);
 void DataManager_ReadBlock(void *buf, size_t blockSize, uint16_t blockAdr);
-
-uint32_t DataManager_GetReadErrors();
-uint32_t DataManager_GetWriteErrors();
-void DataManager_ReserErrors();

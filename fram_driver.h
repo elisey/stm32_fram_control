@@ -24,16 +24,4 @@ void Fram_Memset(uint8_t data);
 bool Fram_WriteBlock ( void* buf, size_t blockSize, uint16_t blockAdr );
 bool Fram_ReadBlock ( void* buf, size_t blockSize, uint16_t blockAdr );
 
-bool Fram_WriteByte(uint8_t data, uint16_t adr);
-bool Fram_WriteDoubleByte(uint16_t data, uint16_t adr);
-bool Fram_WriteFourByte(uint32_t data, uint16_t adr);
-bool Fram_WriteFloat(float data, uint16_t adr);
-bool Fram_WriteDouble(double data, uint16_t adr);
-
-bool Fram_ReadByte(uint8_t *data, uint16_t adr);
-bool Fram_ReadDoubleByte(uint16_t *data, uint16_t adr);
-bool Fram_ReadFourByte(uint32_t *data, uint16_t adr);
-bool Fram_ReadFloat(float *data, uint16_t adr);
-bool Fram_ReadDouble(double *data, uint16_t adr);
-
 #endif /* FRAM_DRIVER_H_ */

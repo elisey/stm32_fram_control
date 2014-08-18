@@ -9,4 +9,4 @@ typedef struct  {
 }DataManager_Data_t;
 
 void DataManager_InitDefaultData();
-void DataManager_ErrorHandler(int error);
+

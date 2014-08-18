@@ -1,6 +1,7 @@
 ﻿#include "stm32f10x.h"
 #include "fram_driver.h"
 #include "data_manager.h"
+#include "memory_rewrite_handler.h"
 
 void DataManager_ErrorHandler(int error);
 
@@ -57,15 +58,29 @@ int main ()
 			DataManager_Load(data32);
 
 
-			rdErr = DataManager_GetReadErrors();
-			wrErr = DataManager_GetWriteErrors();
+			rdErr = MemoryRewriteHandler_GetReadErrors();
+			wrErr = MemoryRewriteHandler_GetWriteErrors();
 			if ( (rdErr != 0) || (wrErr != 0) )	{
-				DataManager_ReserErrors();
+				MemoryRewriteHandler_ReserErrors();
 			}
 	}
 }
 
+void MemoryRewriteHandler_ErrorHandler(int error)
+{
+	switch (error)
+	{
+	case memory_rewrite_handlerERR_WR:
 
+		break;
+	case memory_rewrite_handlerERR_RD:
+
+		break;
+	default:
+
+		break;
+	}
+}
 
 void assert_failed(uint8_t* file, uint32_t line)
 {
