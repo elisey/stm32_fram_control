@@ -2,20 +2,24 @@
 #include "fram_driver.h"
 #include "data_manager.h"
 #include "memory_rewrite_handler.h"
-
+#include "journal.h"
 void DataManager_ErrorHandler(int error);
+
+
+extern void Journal_Test();
 
 int main ()
 {
 	DataManager_Init();
-	Fram_Memset(0xff);
+	Journal_Test();
+	//Fram_Memset(0xff);
 
-	volatile uint32_t rdErr = 0;
-	volatile uint32_t wrErr = 0;
+	//volatile uint32_t rdErr = 0;
+	//volatile uint32_t wrErr = 0;
 
 	while ( 1 ) {
 		// Попытка загрузить данные из очищенной памяти.
-			DataManager_Load(data8);
+			/*DataManager_Load(data8);
 			DataManager_Load(dataFloat);
 			DataManager_Load(data32);
 
@@ -62,7 +66,7 @@ int main ()
 			wrErr = MemoryRewriteHandler_GetWriteErrors();
 			if ( (rdErr != 0) || (wrErr != 0) )	{
 				MemoryRewriteHandler_ReserErrors();
-			}
+			}*/
 	}
 }
 
