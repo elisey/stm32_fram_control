@@ -6,12 +6,12 @@
 /*----------------------------------------------------------------------------
  * Прототипы локальных функций
  ----------------------------------------------------------------------------*/
-void prv_LoadJournalHead (journalSettings_t *this, journalHead_t *ptrJournalHead);
-void prv_SaveJournalHead(journalSettings_t *this, const journalHead_t *ptrJournalHead);
-void prv_LoadJournalItem (journalSettings_t *this, void *journalItem, uint16_t itemIndex);
-void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint16_t itemIndex);
-int16_t prv_GetItemIndexByLastItemOffset (journalSettings_t *this, uint16_t itemNumber);
-bool prv_CheckJournal(journalSettings_t *this);
+static void prv_LoadJournalHead (journalSettings_t *this, journalHead_t *ptrJournalHead);
+static void prv_SaveJournalHead(journalSettings_t *this, const journalHead_t *ptrJournalHead);
+static void prv_LoadJournalItem (journalSettings_t *this, void *journalItem, uint16_t itemIndex);
+static void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint16_t itemIndex);
+static int16_t prv_GetItemIndexByLastItemOffset (journalSettings_t *this, uint16_t itemNumber);
+static bool prv_CheckJournal(journalSettings_t *this);
 
 /*----------------------------------------------------------------------------
  * Глобальные функции
@@ -97,7 +97,7 @@ void Journal_ClearJournal (journalSettings_t *this)
 /*----------------------------------------------------------------------------
  * brief:	Загрузить заголовок журнала
  ----------------------------------------------------------------------------*/
-void prv_LoadJournalHead(journalSettings_t *this, journalHead_t *ptrJournalHead)
+static void prv_LoadJournalHead(journalSettings_t *this, journalHead_t *ptrJournalHead)
 {
 	uint16_t journalOffset;
 
@@ -108,7 +108,7 @@ void prv_LoadJournalHead(journalSettings_t *this, journalHead_t *ptrJournalHead)
 /*----------------------------------------------------------------------------
  * brief:	Сохранить заголовок журнала
  ----------------------------------------------------------------------------*/
-void prv_SaveJournalHead(journalSettings_t *this, const journalHead_t *ptrJournalHead)
+static void prv_SaveJournalHead(journalSettings_t *this, const journalHead_t *ptrJournalHead)
 {
 	uint16_t journalOffset;
 
@@ -120,7 +120,7 @@ void prv_SaveJournalHead(journalSettings_t *this, const journalHead_t *ptrJourna
  * brief:	Загрузка одной записи журнала с индексом itemIndex
  * 			в буфер journalItem.
  ----------------------------------------------------------------------------*/
-void prv_LoadJournalItem(journalSettings_t *this, void *journalItem, uint16_t itemIndex)
+static void prv_LoadJournalItem(journalSettings_t *this, void *journalItem, uint16_t itemIndex)
 {
 	uint16_t size = this->elementSize;
 	uint16_t adr = this->elementSize * itemIndex + sizeof(journalHead_t);
@@ -131,7 +131,7 @@ void prv_LoadJournalItem(journalSettings_t *this, void *journalItem, uint16_t it
 /*----------------------------------------------------------------------------
  * brief:	Сохранить одну запись журнала
  ----------------------------------------------------------------------------*/
-void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint16_t itemIndex)
+static void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint16_t itemIndex)
 {
 	uint16_t size = this->elementSize;
 	uint16_t adr = this->elementSize * itemIndex + sizeof(journalHead_t);
@@ -147,7 +147,7 @@ void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem, uint1
  * 			не будет. Иначе будет переход через нуль, а следовательно нужно
  * 			учесть максимальный размер в элементах кольцевого буфера.
  ----------------------------------------------------------------------------*/
-int16_t prv_GetItemIndexByLastItemOffset(journalSettings_t *this, uint16_t itemNumber)
+static int16_t prv_GetItemIndexByLastItemOffset(journalSettings_t *this, uint16_t itemNumber)
 {
 	journalHead_t journalHead;
 	prv_LoadJournalHead(this, &journalHead);
@@ -171,7 +171,7 @@ int16_t prv_GetItemIndexByLastItemOffset(journalSettings_t *this, uint16_t itemN
 /*----------------------------------------------------------------------------
  * brief:	Проверить журнал на валидность. TRUE - журнал валидный.
  ----------------------------------------------------------------------------*/
-bool prv_CheckJournal(journalSettings_t *this)
+static bool prv_CheckJournal(journalSettings_t *this)
 {
 	journalHead_t journalHead;
 	prv_LoadJournalHead(this, &journalHead);
