@@ -8,7 +8,7 @@ void MemoryRewriteHandler_Init()
 	Fram_Init();
 }
 
-void MemoryRewriteHandler_TryWriteBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr)
+void MemoryRewriteHandler_TryWriteBlock(const void *buf, size_t blockSize, uint16_t blockAdr)
 {
     uint8_t i;
     bool result;
@@ -22,7 +22,7 @@ void MemoryRewriteHandler_TryWriteBlock(uint8_t *buf, size_t blockSize, uint16_t
     MemoryRewriteHandler_ErrorHandler(memory_rewrite_handlerERR_WR);
 }
 
-void MemoryRewriteHandler_TryReadBlock(uint8_t *buf, size_t blockSize, uint16_t blockAdr)
+void MemoryRewriteHandler_TryReadBlock(void *buf, size_t blockSize, uint16_t blockAdr)
 {
 	uint8_t i;
     bool result;

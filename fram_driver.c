@@ -39,7 +39,7 @@ void Fram_Init()
  *			true в случае успеха
  *			false в случае ошибки
  */
-bool Fram_WriteBlock ( void* buf, size_t blockSize, uint16_t blockAdr )
+bool Fram_WriteBlock ( const void* buf, size_t blockSize, uint16_t blockAdr )
 {
 	assert_param(blockSize <= fram_driverMAX_BLOCK_SIZE);		// максимальный размер блока - 4 байта
 																// ибо больше не требуется

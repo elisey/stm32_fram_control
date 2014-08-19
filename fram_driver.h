@@ -17,7 +17,7 @@
 #define fram_driverFRAM_SIZE			0x2000			// Размер в байтах энергонезависимой памяти
 
 void Fram_Init();
-bool Fram_WriteBlock ( void* buf, size_t blockSize, uint16_t blockAdr );
+bool Fram_WriteBlock ( const void* buf, size_t blockSize, uint16_t blockAdr );
 bool Fram_ReadBlock ( void* buf, size_t blockSize, uint16_t blockAdr );
 
 // Сервисные функции
