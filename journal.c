@@ -1,5 +1,6 @@
 #include "journal.h"
 #include "memory_rewrite_handler.h"
+#include "memory_allocator.h"
 
 #define journalVALID_BYTE		0xA0
 
@@ -20,11 +21,11 @@ static bool prv_CheckJournal(journalSettings_t *this);
 /*----------------------------------------------------------------------------
  * brief:	Инициализация журнала this
  ----------------------------------------------------------------------------*/
-void Journal_Init (journalSettings_t *this, uint16_t elementSize, uint16_t offset, uint16_t maxNumOfItems)
+void Journal_Init (journalSettings_t *this, uint16_t elementSize, uint16_t maxNumOfItems)
 {
 	this->elementSize = elementSize;
-	this->offset = offset;
 	this->maxNumOfItems = maxNumOfItems;
+	this->offset = MemoryAllocator_MemoryAllocate(elementSize * maxNumOfItems + sizeof (journalHead_t));
 
 	if (prv_CheckJournal(this) == false)	{
 		Journal_ClearJournal(this);
