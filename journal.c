@@ -125,6 +125,7 @@ static void prv_LoadJournalItem(journalSettings_t *this, void *journalItem, uint
 {
 	uint16_t size = this->elementSize;
 	uint16_t adr = this->elementSize * itemIndex + sizeof(journalHead_t);
+	adr += this->offset;
 
 	MemoryRewriteHandler_TryReadBlock( (void*)journalItem, size, adr );
 }
@@ -136,6 +137,7 @@ static void prv_SaveJournalItem(journalSettings_t *this, const void *journalItem
 {
 	uint16_t size = this->elementSize;
 	uint16_t adr = this->elementSize * itemIndex + sizeof(journalHead_t);
+	adr += this->offset;
 
 	MemoryRewriteHandler_TryWriteBlock( (void*)journalItem, size, adr );
 }
