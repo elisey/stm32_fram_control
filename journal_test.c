@@ -2,6 +2,7 @@
 #include <string.h>
 #include "stm32f10x.h"
 journalSettings_t testJournal;
+journalSettings_t anotherTestJournal;
 
 typedef struct	{
 		uint16_t data1;
@@ -15,7 +16,8 @@ void Journal_Test()
 	bool result;
 
 	myJournal_t item;
-	Journal_Init(&testJournal, sizeof (myJournal_t), 0, 10);
+	Journal_Init(&testJournal, sizeof (myJournal_t), 10);
+	Journal_Init(&anotherTestJournal, sizeof (myJournal_t), 100);
 	Journal_ClearJournal(&testJournal);
 
 	numOfItems = Journal_GetNumberOfItems(&testJournal);
