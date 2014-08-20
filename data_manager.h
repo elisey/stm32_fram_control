@@ -10,12 +10,6 @@ DataManager_Data_t DataManager_Data;
 DataManager_Data_t DataManager_DefaultData;
 #endif
 
-//	Распределение адресов таблиц в энергонезависимой памяти
-#define data_managerMAIN_TABLE_OFFSET     	0
-#define data_managerINVERT_TABLE_OFFSET    	(data_managerMAIN_TABLE_OFFSET		+ sizeof(DataManager_Data_t))
-#define data_managerEND_OF_TABLES   		(data_managerINVERT_TABLE_OFFSET	+ sizeof(DataManager_Data_t))
-#define data_managerSIZE_OF_DATA			data_managerEND_OF_TABLES			- data_managerMAIN_TABLE_OFFSET
-
 #define SIZE_OF_MEMBER(s,m) 		((size_t)sizeof(s.m))
 
 // Макросы, обеспечивающие функциональность данного модуля
@@ -27,3 +21,5 @@ DataManager_Data_t DataManager_DefaultData;
 void DataManager_Init();
 void DataManager_WriteBlock(void *buf, size_t blockSize, uint16_t blockAdr);
 void DataManager_ReadBlock(void *buf, size_t blockSize, uint16_t blockAdr);
+
+uint16_t DataManager_GetSizeOfData();
